@@ -1,34 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ProductGrid from "./components/ProductGrid";
 import { Product } from "./types/Product";
+import { fetchProducts } from "./lib/fetchProducts";
+import ProductGrid from "./components/ProductGrid";
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
-
-  const fetchProducts = async () => {
+  const loadData = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/products`);
-      const data = await res.json();
-      setProducts(data.data ?? []);
+      const data = await fetchProducts();
+      setProducts(data);
       setError(null);
     } catch (err) {
-      console.error("Fetch error:", err);
-      setError("Failed to load products.");
+      console.error("Error fetching products:", err);
+      setError("Failed to load products. Try again later.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchProducts();
-    const interval = setInterval(fetchProducts, 30000);
-    return () => clearInterval(interval);
+    loadData();
+    const intervalId = setInterval(loadData, 30000);
+    return () => clearInterval(intervalId);
   }, []);
 
   return (
