@@ -15,7 +15,7 @@ class JumiaScrapingService
         $this->productRepository = $productRepository;
     }
 
-    public function fetchProducts(String $url)
+    public function fetchProducts(String $url): array
     {
         $html = Http::withHeaders([
             'User-Agent' => $this->getRandomUserAgent(),
@@ -36,10 +36,8 @@ class JumiaScrapingService
 
         return $products;
     }
-    public function storeProduct(ProductDTO $product)
+    public function storeProduct(ProductDTO $product): void
     {
-                dump($product);
-
         $this->productRepository->store($product);
     }
     private function getRandomUserAgent(): string

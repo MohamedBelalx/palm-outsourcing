@@ -12,4 +12,8 @@ class ProductRepository implements IProductRepository
     {
         Product::create($product->toArray());
     }
+    public function getAllProducts() : \Illuminate\Database\Eloquent\Collection
+    {
+        return Product::all();
+    }
 }
