@@ -17,11 +17,19 @@ class JumiaScrapingService
 
     public function fetchProducts(String $url): array
     {
-        $html = Http::withHeaders([
-            'User-Agent' => $this->getRandomUserAgent(),
-        ])->get($url)->body(); // Uses Guzzle under the hood
+        // without proxy
+        // $html = Http::withHeaders([
+        //     'User-Agent' => $this->getRandomUserAgent(),
+        // ])->get($url)->body(); // Uses Guzzle under the hood
 
+        // with proxy
+        $proxy = Http::get('http://localhost:8081/proxy')->json('proxy');
+        $html = Http::withOptions(['proxy' => $proxy])
+        ->withHeaders(['User-Agent' => $this->getRandomUserAgent(),])
+        ->get($url)
+        ->body();
         $crawler = new Crawler($html);
+        dd($html);
 
         $products = [];
 
@@ -32,8 +40,8 @@ class JumiaScrapingService
 
             $products[] = new ProductDTO($name, $price, $img);
         });
+        dd($products);
         collect($products)->each(fn($product) => $this->storeProduct($product));
-
         return $products;
     }
     public function storeProduct(ProductDTO $product): void
